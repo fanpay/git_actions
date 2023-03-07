@@ -16,8 +16,8 @@ class Persona:
    def dar_edad(self):
        return(self.__edad)
 
-   def dar_nombre(self):
-       return(self.__nombre)
+   def dar_nombre(self): 
+       return(self.__nombre) 
 
    def calcular_anio_nacimiento(self, ya_cumplio_anios):
        anio_actual = datetime.datetime.now().year
