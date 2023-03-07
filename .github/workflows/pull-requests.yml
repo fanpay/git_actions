@@ -20,9 +20,9 @@ jobs:
         os: [ubuntu-latest]
     steps:
     - name: Checkout de repositorio
-      uses: actions/checkout@v3
+      uses: actions/checkout@v2
     - name: Configuración de entorno de python
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v2
       with:
           python-version: '3.7'
     - name: Instalación de librerías y dependencias
@@ -40,8 +40,6 @@ jobs:
   automerge:
     needs: job1
     runs-on: ubuntu-latest
-    if: |
-      contains(github.event.pull_request.labels.*.name, 'auto-merge') && github.event.pull_request.draft == false
     steps:
       - id: automerge
         name: automerge
@@ -51,8 +49,6 @@ jobs:
           MERGE_LABELS: "auto-merge"
           UPDATE_LABELS: "auto-merge"
           MERGE_COMMIT_MESSAGE: "pull-request-title-and-description"
-          MERGE_METHOD: "squash"
           MERGE_RETRIES: "3"
           MERGE_RETRY_SLEEP: "10000"
-          MERGE_REQUIRED_APPROVALS: "0"
           
