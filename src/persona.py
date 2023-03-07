@@ -24,5 +24,5 @@ class Persona:
        if ya_cumplio_anios:
            return (anio_actual - self.__edad)
        else:
-           print("paila")
+           print("paila actualizacion")
            return (anio_actual - self.__edad + 1)
