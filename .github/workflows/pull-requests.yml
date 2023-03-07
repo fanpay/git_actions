@@ -11,6 +11,12 @@ on:
       - reopened
       - unlocked
     branches: [ main ]
+    
+permissions:
+  contents: 'read'
+  id-token: 'write'
+  issues: 'write' #__This fixed the HttpError: Resource not accessible by integration
+
 jobs:
   job1:
     name: Pruebas
