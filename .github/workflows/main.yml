@@ -1,7 +1,7 @@
 name: Hola mundo
 on:
   push:
-    branches: [ master ]  #rama o ramas específicas donde se espera el evento ocurra
+    branches: [ main ]  #rama o ramas específicas donde se espera el evento ocurra
 jobs:
   Mi-primer-job:
     name: Mi primer job
