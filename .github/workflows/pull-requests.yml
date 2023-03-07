@@ -17,7 +17,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-latest, ubuntu-18.04]
+        os: [ubuntu-18.04]
     steps:
     - name: Checkout de repositorio
       uses: actions/checkout@v2
@@ -44,6 +44,8 @@ jobs:
     steps:
       - name: automerge
         uses: "pascalgn/automerge-action@v0.15.6"
+        with:
+          label: 'automerge'
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-          label: 'automerge'
+          
