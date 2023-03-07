@@ -24,4 +24,4 @@ class Persona:
        if ya_cumplio_anios:
            return (anio_actual - self.__edad)
        else:
-           return (anio_actual - self.__edad + 1)
+           return (anio_actual - self.__edad + 1)   
