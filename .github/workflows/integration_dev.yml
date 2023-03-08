@@ -38,6 +38,7 @@ jobs:
     needs: job1
     permissions: write-all
     runs-on: ubuntu-latest
+    if: ${{ contains(github.event.head_commit.message, '(Azul)') && contains(github.ref,'integration') && !endsWith(github.event.head_commit.message, '[ready_to_merge]')}}
     steps:
      - name: Mezcla ${{ github.ref }} -> develop
        uses: tukasz/direct-merge-action@master
@@ -45,3 +46,18 @@ jobs:
          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
          source-branch: ${{ github.ref }}
          target-branch: develop
+         commit-message: "Se actualiza develop con la rama ${{ github.ref }}"
+         
+  release:
+    needs: job1
+    permissions: write-all
+    runs-on: ubuntu-latest
+    if: ${{ endsWith(github.event.head_commit.message, '[ready_to_merge]') && contains(github.ref,'integration') }}
+    steps:
+     - name: Mezcla ${{ github.ref }} -> develop y prepara release
+       uses: tukasz/direct-merge-action@master
+       with:
+         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+         source-branch: ${{ github.ref }}
+         target-branch: develop
+         commit-message: "Se actualiza develop con la rama ${{ github.ref }}. Develop is ready to merge in main!"
