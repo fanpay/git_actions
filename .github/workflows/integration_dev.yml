@@ -60,7 +60,7 @@ jobs:
          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
          source-branch: ${{ github.ref }}
          target-branch: develop
-         commit-message: "Se actualiza develop con la rama ${{ github.ref }}. Listo para liberar [release]"
+         commit-message: "Listo para liberar [release]"
          
      - name: Sleep for 10s
        uses: juliangruber/sleep-action@v1
