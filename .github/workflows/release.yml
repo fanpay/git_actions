@@ -1,9 +1,20 @@
 name: Creating release version
 on: 
  push:
-     branches: [develop]
+     branches:
+         - develop
+         - 'testing_**'
     
 jobs:
+  testinggg:
+   permissions: write-all
+   runs-on: ubuntu-latest
+   steps:
+    - name: Imprimir mensajes
+      run: |
+        echo "COMMIT MENSAJE ----> ${{ github.event.head_commit.message }}"
+        echo EVENT ----> ${{ github.event }}"
+        
   release:
    permissions: write-all
    runs-on: ubuntu-latest
