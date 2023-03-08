@@ -17,11 +17,11 @@ class PersonaTestCase(unittest.TestCase):
       self.assertEqual(self.perro1.dar_propietario(), 'Fabián')
 
    def test_asignacion(self):
-      self.perro2.asignar_raza("Labrador") 
-      self.perro2.asignar_nombre("Violeta")
+      self.perro2.asignar_raza("Labrador")
+      self.perro2.asignar_nombre("Violet")
       self.assertFalse(self.perro2.dar_nombre()=='Titán')
       self.assertFalse(self.perro2.dar_raza()=='American Bully')
-      self.assertTrue(self.perro2.dar_nombre()=='Violeta')
+      self.assertTrue(self.perro2.dar_nombre()=='Violet')
       self.assertTrue(self.perro2.dar_raza()=='Labrador')
 
    def test_objetos_iguales(self):
