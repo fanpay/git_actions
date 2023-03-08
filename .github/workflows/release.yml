@@ -5,7 +5,7 @@ on:
 jobs:
   job1:
     name: Pruebas
-    if: ${{ endsWith(github.event.head_commit.message, '(Azul)') && contains(github.ref,'integration') && contains(github.event.head_commit.message, '[ready_to_merge]')}}
+    if: ${{ contains(github.event.head_commit.message, '[ready_to_merge]')}}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -24,23 +24,17 @@ jobs:
     - name: Correr pruebas
       id: correr-pruebas
       run: |
-        python -m unittest -v tests/test_persona.py
-        python -m unittest -v tests/test_perro.py
-    - name: Send passing unit test metrics
-      if: success()
-      run: echo "Pasaron las pruebas. Wiiii"
-    - name: Send failing unit test metrics
-      if: fail()
-      run: echo "Pailas, no pasaron las pruebas T-T"
-        
+        python -m unittest -v 
     - name:  Cubrimiento personalizado   
       id: cubrimiento
       run: |
-          coverage run -m unittest tests/*.py
-          coverage report -m
+          coverage run -m unittest
+          coverage report --fail-under=98  
      
     - name: Printing coverage result
-      run: echo "RAMA INVOCADA ----> ${{ github.ref }}"
+      run: |
+       echo "RAMA INVOCADA ----> ${{ github.event.head_commit.message }}"
+       echo "MENSAJE COMMIT ----> ${{ github.event.head_commit.message }}"
            
     
     
