@@ -1,0 +1,49 @@
+name: Creating release version
+on:
+ push:
+     branches: [develop]
+jobs:
+  job1:
+    name: Pruebas
+    if: ${{ endsWith(github.event.head_commit.message, '(Azul)') && contains(github.ref,'integration') && contains(github.event.head_commit.message, '[ready_to_merge]')}}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+    steps:     
+    - name: Checkout de repositorio
+      uses: actions/checkout@v3
+    - name: Configuración de entorno de python
+      uses: actions/setup-python@v4
+      with:
+          python-version: '3.9'
+    - name: Instalación de librerías y dependencias
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    - name: Correr pruebas
+      id: correr-pruebas
+      run: |
+        python -m unittest -v tests/test_persona.py
+        python -m unittest -v tests/test_perro.py
+    - name: Send passing unit test metrics
+        uses: correr-pruebas
+        if: success()
+        run: echo "Pasaron las pruebas. Wiiii"
+    - name: Send failing unit test metrics
+        uses: correr-pruebas
+        if: fail()
+        run: echo "Pailas, no pasaron las pruebas T-T"
+        
+    - name:  Cubrimiento personalizado   
+      id: cubrimiento
+      run: |
+          coverage run -m unittest tests/*.py
+          coverage report -m
+     
+     - name: Printing coverage result
+      run: echo "RAMA INVOCADA ----> ${{ github.ref }}"
+           
+    
+    
+

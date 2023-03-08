@@ -8,7 +8,6 @@ jobs:
     name: Pruebas
     runs-on: ubuntu-latest
     if: ${{ endsWith(github.event.head_commit.message, '(Azul)') && contains(github.ref,'integration') }}
-     
     steps:
     - name: Printing variables
       run: echo "RAMA INVOCADA ----> ${{ github.ref }}"
