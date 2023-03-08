@@ -3,8 +3,7 @@ on:
  push:
      branches:
          - develop
-         - 'testing_**'
-    
+
 jobs:
   testinggg:
    permissions: write-all
