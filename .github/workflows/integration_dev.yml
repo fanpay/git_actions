@@ -7,10 +7,13 @@ jobs:
   job1:
     name: Pruebas
     runs-on: ubuntu-latest
-    if: ${{ endsWith(github.event.head_commit.message, '(Azul)') && contains(github.ref,'integration') }}
+    if: ${{ endsWith(github.event.head_commit.message, '(Azul)') && contains(github.ref,'integration') && !contains(github.event.head_commit.message, '[ready_to_merge]')}}
     steps:
     - name: Printing variables
-      run: echo "RAMA INVOCADA ----> ${{ github.ref }}"
+      run: |
+       echo "RAMA INVOCADA ----> ${{ github.ref }}"
+       echo "MENSAJE COMMIT ----> ${{ github.event.head_commit.message }}"
+       
     - name: Checkout de repositorio
       uses: actions/checkout@v3
     - name: Configuración de entorno de python
