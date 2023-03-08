@@ -1,16 +1,21 @@
 name: Creating release version
 on:
  push:
-     branches: [develop]
+     branches: 
+        - 'develop'
 jobs:
   job1:
     name: Pruebas
-    if: ${{ contains(github.event.head_commit.message, '[ready_to_merge]')}}
+    if: ${{ contains(github.event.head_commit.message, 'ready to merge')}}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-latest]
     steps:     
+    - name: Printing variables
+      run: |
+       echo "RAMA INVOCADA ----> ${{ github.ref }}"
+       echo "MENSAJE COMMIT ----> ${{ github.event.head_commit.message }}"
     - name: Checkout de repositorio
       uses: actions/checkout@v3
     - name: Configuración de entorno de python
