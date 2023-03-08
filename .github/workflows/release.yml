@@ -27,13 +27,11 @@ jobs:
         python -m unittest -v tests/test_persona.py
         python -m unittest -v tests/test_perro.py
     - name: Send passing unit test metrics
-        uses: correr-pruebas
-        if: success()
-        run: echo "Pasaron las pruebas. Wiiii"
+      if: success()
+      run: echo "Pasaron las pruebas. Wiiii"
     - name: Send failing unit test metrics
-        uses: correr-pruebas
-        if: fail()
-        run: echo "Pailas, no pasaron las pruebas T-T"
+      if: fail()
+      run: echo "Pailas, no pasaron las pruebas T-T"
         
     - name:  Cubrimiento personalizado   
       id: cubrimiento
@@ -41,7 +39,7 @@ jobs:
           coverage run -m unittest tests/*.py
           coverage report -m
      
-     - name: Printing coverage result
+    - name: Printing coverage result
       run: echo "RAMA INVOCADA ----> ${{ github.ref }}"
            
     
