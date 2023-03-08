@@ -6,7 +6,7 @@ class PersonaTestCase(unittest.TestCase):
 
    def setUp(self):
       self.perro1 = Perro(nombre='Berlín', raza="Border Collie", propietario="Fabián")
-      self.perro2 = Perro(nombre='Titán', raza="American Bully", propietario="Nathy")
+      self.perro2 = Perro(nombre='Titán', raza="American Bully", propietario="Miller")
       self.perro3 = Perro(nombre='Donna', raza="Golden", propietario="Edward")
       self.perro4 = Perro(nombre='Aslan', raza="Husky", propietario="Laura")
       self.grupo = [self.perro1, self.perro2, self.perro3]
