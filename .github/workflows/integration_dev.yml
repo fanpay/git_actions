@@ -1,0 +1,46 @@
+name: Pruebas unitarias
+on:
+ push:
+     branches:
+         - 'testing_**'
+jobs:
+  job1:
+    name: Pruebas
+    runs-on: ubuntu-latest
+    if: |
+     ${{ contains(github.event.head_commit.message, '(Azul)')}}
+    steps:
+    - name: Printing variables
+      run: echo "RAMA INVOCADA ----> ${{ github.ref }}"
+    - name: Checkout de repositorio
+      uses: actions/checkout@v3
+    - name: Configuración de entorno de python
+      uses: actions/setup-python@v4
+      with:
+          python-version: '3.9'
+    - name: Instalación de librerías y dependencias
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    - name: Correr pruebas
+      id: correr-pruebas
+      run: |
+        python -m unittest -v tests/test_persona.py
+        python -m unittest -v tests/test_perro.py
+    - name:  Cubrimiento personalizado
+      id: cubrimiento
+      run: |
+          coverage run -m unittest tests/*.py
+          coverage report -m
+           
+  automerge:
+    needs: job1
+    permissions: write-all
+    runs-on: ubuntu-latest
+    steps:
+     - name: Mezcla ${{ github.ref }} -> develop
+       uses: tukasz/direct-merge-action@master
+       with:
+         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+         source-branch: ${{ github.ref }}
+         target-branch: develop
