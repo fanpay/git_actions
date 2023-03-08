@@ -8,14 +8,13 @@ jobs:
     name: Pruebas
     runs-on: ubuntu-latest
     if: ${{ endsWith(github.event.head_commit.message, '(Azul)') && contains(github.ref,'integration') }}
-
     steps:
     - name: Printing variables
       run: echo "RAMA INVOCADA ----> ${{ github.ref }}"
     - name: Checkout de repositorio
       uses: actions/checkout@v3
     - name: Configuración de entorno de python
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v4
       with:
           python-version: '3.9'
     - name: Instalación de librerías y dependencias
@@ -32,4 +31,15 @@ jobs:
       run: |
           coverage run -m unittest tests/*.py
           coverage report -m
-          
+           
+  automerge:
+    needs: job1
+    permissions: write-all
+    runs-on: ubuntu-latest
+    steps:
+     - name: Mezcla ${{ github.ref }} -> develop
+       uses: tukasz/direct-merge-action@master
+       with:
+         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+         source-branch: ${{ github.ref }}
+         target-branch: develop
