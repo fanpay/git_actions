@@ -12,7 +12,7 @@ class PersonaTestCase(unittest.TestCase):
       self.grupo = [self.perro1, self.perro2, self.perro3]
 
    def test_constructor(self):
-      self.assertEqual(self.perro1.dar_nombre(), 'Berlín')
+      self.assertEqual(self.perro1.dar_nombre(), 'Berlí')
       self.assertEqual(self.perro1.dar_raza(), 'Border Collie')
       self.assertEqual(self.perro1.dar_propietario(), 'Fabián')
 
