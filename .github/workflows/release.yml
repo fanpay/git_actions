@@ -32,7 +32,9 @@ jobs:
           coverage report --fail-under=98  
      
     - name: Printing coverage result
-      run: echo "RAMA INVOCADA ----> ${{ github.event.head_commit.message }}"
+      run: |
+       echo "RAMA INVOCADA ----> ${{ github.event.head_commit.message }}"
+       echo "MENSAJE COMMIT ----> ${{ github.event.head_commit.message }}"
            
     
     
