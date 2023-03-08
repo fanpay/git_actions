@@ -5,7 +5,7 @@ on:
 jobs:
   job1:
     name: Pruebas
-    if: ${{ endsWith(github.event.head_commit.message, '(Azul)') && contains(github.ref,'integration') && contains(github.event.head_commit.message, '[ready_to_merge]')}}
+    if: ${{ contains(github.event.head_commit.message, '[ready_to_merge]')}}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
