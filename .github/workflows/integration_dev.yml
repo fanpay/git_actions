@@ -8,8 +8,7 @@ jobs:
     name: Pruebas
     runs-on: ubuntu-latest
     if: |
-     ${{ contains(github.event.head_commit.message, '(Azul)')}}
-     1 == 1
+     ${{ contains(github.event.head_commit.message, '(Verde)')}}
     steps:
     - name: Printing variables
       run: echo "RAMA INVOCADA ----> ${{ github.ref }}"
