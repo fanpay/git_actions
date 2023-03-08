@@ -1,8 +1,7 @@
 name: Creating release version
 on: 
  push:
-     branches:
-      - 'develop'
+     branches: [develop]
     
 jobs:
   release:
