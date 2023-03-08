@@ -35,6 +35,7 @@ jobs:
            
   automerge:
     needs: job1
+    permissions: write-all
     runs-on: ubuntu-latest
     steps:
      - name: Mezcla ${{ github.ref }} -> develop
