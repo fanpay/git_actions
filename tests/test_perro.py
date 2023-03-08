@@ -5,15 +5,16 @@ from src.perro import Perro
 class PersonaTestCase(unittest.TestCase):
 
    def setUp(self):
-      self.perro1 = Perro(nombre='Berlín', raza="Border Collie")
-      self.perro2 = Perro(nombre='Titán', raza="American Bully")
-      self.perro3 = Perro(nombre='Alejandra', raza="Golden")
-      self.perro4 = Perro(nombre='Aslan', raza="Husky")
+      self.perro1 = Perro(nombre='Berlín', raza="Border Collie", propietario="Fabián")
+      self.perro2 = Perro(nombre='Titán', raza="American Bully", propietario="Nathy")
+      self.perro3 = Perro(nombre='Donna', raza="Golden", propietario="Eli")
+      self.perro4 = Perro(nombre='Aslan', raza="Husky", propietario="Walter")
       self.grupo = [self.perro1, self.perro2, self.perro3]
 
    def test_constructor(self):
       self.assertEqual(self.perro1.dar_nombre(), 'Berlín')
       self.assertEqual(self.perro1.dar_raza(), 'Border Collie')
+      self.assertEqual(self.perro1.dar_propietario(), 'Fabián')
 
    def test_asignacion(self):
       self.perro2.asignar_raza("Labrador")
