@@ -15,7 +15,7 @@ jobs:
     - name: Checkout de repositorio
       uses: actions/checkout@v3
     - name: Configuración de entorno de python
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v4
       with:
           python-version: '3.9'
     - name: Instalación de librerías y dependencias
@@ -35,6 +35,7 @@ jobs:
            
   automerge:
     needs: job1
+    permissions: write-all
     runs-on: ubuntu-latest
     steps:
      - name: Mezcla ${{ github.ref }} -> develop
