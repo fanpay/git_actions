@@ -26,7 +26,7 @@ class PersonaTestCase(unittest.TestCase):
    def test_objetos_iguales(self):
       perro_nuevo = self.perro1
       self.assertIsNot(self.perro1, self.perro3)
-      self.assertIs(self.perro1, perro_nuevo)
+      self.assertIs(self.perro1, perro_nuevo) 
 
    def test_elemento_en_conjunto(self):
       self.assertIn(self.perro3, self.grupo)
