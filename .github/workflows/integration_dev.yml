@@ -38,7 +38,7 @@ jobs:
     needs: job1
     permissions: write-all
     runs-on: ubuntu-latest
-    if: ${{ contains(github.event.head_commit.message, '(Azul)') && contains(github.ref,'integration') && !endsWith(github.event.head_commit.message,'[release]')}}
+    if: ${{ !endsWith(github.event.head_commit.message,'[release]')}}
     steps:
      - name: Mezcla ${{ github.ref }} -> develop
        uses: tukasz/direct-merge-action@master
@@ -52,7 +52,7 @@ jobs:
     needs: job1
     permissions: write-all
     runs-on: ubuntu-latest
-    if: ${{ contains(github.event.head_commit.message, '(Azul)') && contains(github.ref,'integration') && endsWith(github.ref,'[release]')}}
+    if: ${{ endsWith(github.event.head_commit.message,'[release]')}}
     steps:
      - name: Mezcla ${{ github.ref }} -> develop
        uses: tukasz/direct-merge-action@master
