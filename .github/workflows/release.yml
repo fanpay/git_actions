@@ -1,12 +1,30 @@
 name: Creating release version
-on:
+on: 
  push:
-     branches: 
-        - 'develop'
+     branches:
+      - 'develop'
+    
 jobs:
+  release:
+   permissions: write-all
+   runs-on: ubuntu-latest
+   if: ${{ endsWith(github.event.head_commit.message, '[release]') }}
+   steps:
+    - name: Crear rama
+      run: |
+        git checkout develop
+        git checkout -b release/1.0.0
+        git push -f -u origin release/1.0.0
+    - name: Mezcla develop -> release
+      uses: tukasz/direct-merge-action@master
+      with:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        source-branch: develop
+        target-branch: release/1.0.0
+        commit-message: "Se actualiza la rama release con la rama develop. Release is ready to merge in main!"
   job1:
+    needs: release
     name: Pruebas
-    if: ${{ contains(github.event.head_commit.message, 'ready to merge')}}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -40,7 +58,14 @@ jobs:
       run: |
        echo "RAMA INVOCADA ----> ${{ github.event.head_commit.message }}"
        echo "MENSAJE COMMIT ----> ${{ github.event.head_commit.message }}"
+       
+    - name: Mezcla release -> main
+      uses: tukasz/direct-merge-action@master
+      with:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        source-branch: release/1.0.0
+        target-branch: main
+        commit-message: "Se integra rama release version 1.0.0 en main. Integración lista"
            
     
     
-
