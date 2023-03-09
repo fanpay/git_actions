@@ -5,6 +5,9 @@ on:
       release_version:
         required: true
         type: string
+      release_tag:
+        required: true
+        type: string
 jobs:        
   release:
    permissions: write-all
