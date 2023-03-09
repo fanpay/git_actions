@@ -6,7 +6,10 @@ on:
 jobs:
   pruebas:
     name: Pruebas
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, windows-latest]
     if: ${{ contains(github.event.head_commit.message, '(Azul)') && contains(github.ref,'integration') }}
     steps:
     - name: Checkout de repositorio
@@ -32,7 +35,10 @@ jobs:
   automerge:
     needs: pruebas
     permissions: write-all
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, windows-latest]
     if: ${{ !endsWith(github.event.head_commit.message,'[release]')}}
     steps:
      - name: Mezcla ${{ github.ref }} -> develop
@@ -46,7 +52,10 @@ jobs:
   prepare_release:
     needs: pruebas
     permissions: write-all
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, windows-latest]
     if: ${{ endsWith(github.event.head_commit.message,'[release]')}}
     steps:
      - name: Mezcla ${{ github.ref }} -> develop
