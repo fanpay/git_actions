@@ -9,7 +9,7 @@ jobs:
 
   generate_version:
     name: Generando version
-    needs: prepare_release
+    
      
     runs-on: ${{ matrix.os }}
     strategy:
