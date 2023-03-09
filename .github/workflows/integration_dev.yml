@@ -62,11 +62,15 @@ jobs:
          target-branch: develop
          commit-message: "Listo para liberar [release]"
          
-     - name: Sleep for 4s
+     - name: Sleep for 3s
        uses: juliangruber/sleep-action@v1
        with:
-         time: 4s
+         time: 3s
          
-     - name: Release workflow
-       uses: fanpay/git_actions/.github/workflows/release.yml@main
+         
+  invoke_workflow:
+    needs: release
+    permissions: write-all
+    if: ${{ endsWith(github.event.head_commit.message,'[release]')}}   
+    uses: fanpay/git_actions/.github/workflows/release.yml@main
          
