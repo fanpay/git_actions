@@ -5,7 +5,6 @@ on:
          - 'testing_**'
   
 jobs:
-
   tests:
     name: Pruebas
     permissions: write-all
