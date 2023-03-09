@@ -22,7 +22,7 @@ class PersonaTestCase(unittest.TestCase):
       self.assertFalse(self.perro2.dar_nombre()=='Titán')
       self.assertFalse(self.perro2.dar_raza()=='American Bully')
       self.assertTrue(self.perro2.dar_nombre()=='Simón')
-      self.assertTrue(self.perro2.dar_raza()=='Labrador')
+      self.assertTrue(self.perro2.dar_raza()=='Labrador') 
 
    def test_objetos_iguales(self):
       perro_nuevo = self.perro1
