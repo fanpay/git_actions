@@ -2,24 +2,22 @@ name: Creating release version
 on: 
   workflow_call:
 
-jobs:
-  testinggg:
-   permissions: write-all
-   runs-on: ubuntu-latest
-   steps:
-    - name: Imprimir mensajes
-      run: |
-        echo "COMMIT MENSAJE ----> ${{ github.event.head_commit.message }}"
-        echo "EVENT ----> ${{ github.event }}"
-        
+jobs:        
   release:
    permissions: write-all
    runs-on: ubuntu-latest
    if: ${{ endsWith(github.event.head_commit.message, '[release]') }}
    steps:
+    - name: Checkout de repositorio
+      uses: actions/checkout@v3
+      with:
+        ref: develop
+    - name: Printing Create BRANCH
+      run: |
+       echo "RAMA ACTUAL ----> ${{ github.ref }}"
+       echo "MENSAJE COMMIT ----> ${{ github.event.head_commit.message }}"
     - name: Crear rama
       run: |
-        git checkout develop
         git checkout -b release/1.0.0
         git push -f -u origin release/1.0.0
     - name: Mezcla develop -> release
@@ -60,12 +58,7 @@ jobs:
       run: |
           coverage run -m unittest
           coverage report --fail-under=98  
-     
-    - name: Printing coverage result
-      run: |
-       echo "RAMA INVOCADA ----> ${{ github.event.head_commit.message }}"
-       echo "MENSAJE COMMIT ----> ${{ github.event.head_commit.message }}"
-       
+          
     - name: Mezcla release -> main
       uses: tukasz/direct-merge-action@master
       with:
