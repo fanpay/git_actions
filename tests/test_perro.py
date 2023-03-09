@@ -18,10 +18,10 @@ class PersonaTestCase(unittest.TestCase):
 
    def test_asignacion(self):
       self.perro2.asignar_raza("Labrador")
-      self.perro2.asignar_nombre("Violet")
+      self.perro2.asignar_nombre("Simón")
       self.assertFalse(self.perro2.dar_nombre()=='Titán')
       self.assertFalse(self.perro2.dar_raza()=='American Bully')
-      self.assertTrue(self.perro2.dar_nombre()=='Violet')
+      self.assertTrue(self.perro2.dar_nombre()=='Simón')
       self.assertTrue(self.perro2.dar_raza()=='Labrador')
 
    def test_objetos_iguales(self):
