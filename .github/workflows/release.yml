@@ -17,6 +17,9 @@ jobs:
         ref: develop
     - name: Crear rama
       run: |
+        git fetch origin
+        git checkout develop
+        git pull
         git checkout -b release/1.0.0
         git push -f -u origin release/1.0.0
     - name: Mezcla develop -> release
@@ -26,7 +29,7 @@ jobs:
         source-branch: develop
         target-branch: release/1.0.0
         commit-message: "Se actualiza la rama release con la rama develop. Release is ready to merge in main!"
-  job1:
+  pruebas:
     needs: release
     name: Pruebas
     runs-on: ${{ matrix.os }}
@@ -36,6 +39,8 @@ jobs:
     steps:     
     - name: Checkout de repositorio
       uses: actions/checkout@v3
+      with:
+        ref: release/1.0.0
     - name: Configuración de entorno de python
       uses: actions/setup-python@v4
       with:
