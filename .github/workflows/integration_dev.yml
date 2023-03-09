@@ -11,7 +11,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-latest, windows-latest]
+        os: [macos-latest]
     if: ${{ contains(github.event.head_commit.message, '(Azul)') && contains(github.ref,'integration') }}
     steps:
     - name: Checkout de repositorio
@@ -47,7 +47,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-latest, windows-latest]
+        os: [macos-latest]
     if: ${{ !endsWith(github.event.head_commit.message,'[release]')}}
     steps:
      - name: Mezcla ${{ github.ref }} -> develop
@@ -64,7 +64,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-latest, windows-latest]
+        os: [macos-latest]
     if: ${{ endsWith(github.event.head_commit.message,'[release]')}}
     steps:
      - name: Mezcla ${{ github.ref }} -> develop
@@ -73,7 +73,7 @@ jobs:
          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
          source-branch: ${{ github.ref }}
          target-branch: develop
-         commit-message: "Merge completo. Listo para liberar [release]"
+         commit-message: "Merge completo. Listo para crear [release]"
          
              
   invoke_workflow:
@@ -82,5 +82,5 @@ jobs:
     if: ${{ endsWith(github.event.head_commit.message,'[release]')}}   
     uses: fanpay/git_actions/.github/workflows/release.yml@main
     with:
-      release_version: release/1.0.2
+      release_version: release/1.0.3
          
