@@ -5,17 +5,16 @@ on:
 jobs:        
   release:
    permissions: write-all
-   runs-on: ubuntu-latest
+   runs-on: ${{ matrix.os }}
+   strategy:
+      matrix:
+        os: [macos-latest, windows-latest]
    if: ${{ endsWith(github.event.head_commit.message, '[release]') }}
    steps:
     - name: Checkout de repositorio
       uses: actions/checkout@v3
       with:
         ref: develop
-    - name: Printing Create BRANCH
-      run: |
-       echo "RAMA ACTUAL ----> ${{ github.ref }}"
-       echo "MENSAJE COMMIT ----> ${{ github.event.head_commit.message }}"
     - name: Crear rama
       run: |
         git checkout -b release/1.0.0
@@ -33,12 +32,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest]
+        os: [macos-latest, windows-latest]
     steps:     
-    - name: Printing variables
-      run: |
-       echo "RAMA INVOCADA ----> ${{ github.ref }}"
-       echo "MENSAJE COMMIT ----> ${{ github.event.head_commit.message }}"
     - name: Checkout de repositorio
       uses: actions/checkout@v3
     - name: Configuración de entorno de python
@@ -67,5 +62,4 @@ jobs:
         target-branch: main
         commit-message: "Se integra rama release version 1.0.0 en main. Integración lista"
            
-    
     
