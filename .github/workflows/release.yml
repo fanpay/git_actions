@@ -1,7 +1,10 @@
 name: Creating release version
 on: 
   workflow_call:
-
+    inputs:
+      release_version:
+        required: true
+        type: string
 jobs:        
   release:
    permissions: write-all
@@ -20,14 +23,14 @@ jobs:
         git fetch origin
         git checkout develop
         git pull
-        git checkout -b release/1.0.0
-        git push -f -u origin release/1.0.0
+        git checkout -b ${{inputs.release_version}}
+        git push -f -u origin ${{inputs.release_version}}
     - name: Mezcla develop -> release
       uses: tukasz/direct-merge-action@master
       with:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         source-branch: develop
-        target-branch: release/1.0.0
+        target-branch: ${{inputs.release_version}}
         commit-message: "Se actualiza la rama release con la rama develop. Release is ready to merge in main!"
   pruebas:
     needs: release
@@ -40,7 +43,7 @@ jobs:
     - name: Checkout de repositorio
       uses: actions/checkout@v3
       with:
-        ref: release/1.0.0
+        ref: ${{inputs.release_version}}
     - name: Configuración de entorno de python
       uses: actions/setup-python@v4
       with:
@@ -63,8 +66,8 @@ jobs:
       uses: tukasz/direct-merge-action@master
       with:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        source-branch: release/1.0.0
+        source-branch: ${{inputs.release_version}}
         target-branch: main
-        commit-message: "Se integra rama release version 1.0.0 en main. Integración lista"
+        commit-message: "Se integra rama ${{inputs.release_version}} en main. Integración lista"
            
     
