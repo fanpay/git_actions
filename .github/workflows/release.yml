@@ -1,8 +1,6 @@
 name: Creating release version
 on: 
- push:
-     branches:
-         - develop
+  workflow_call:
 
 jobs:
   testinggg:
