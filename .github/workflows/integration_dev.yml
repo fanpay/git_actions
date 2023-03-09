@@ -72,4 +72,6 @@ jobs:
     permissions: write-all
     if: ${{ endsWith(github.event.head_commit.message,'[release]')}}   
     uses: fanpay/git_actions/.github/workflows/release.yml@main
+    with:
+      release_version: release/1.0.1
          
