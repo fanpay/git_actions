@@ -4,16 +4,11 @@ on:
      branches:
          - 'testing_**'
 jobs:
-  job1:
+  pruebas:
     name: Pruebas
     runs-on: ubuntu-latest
     if: ${{ contains(github.event.head_commit.message, '(Azul)') && contains(github.ref,'integration') }}
     steps:
-    - name: Printing variables
-      run: |
-       echo "RAMA INVOCADA ----> ${{ github.ref }}"
-       echo "MENSAJE COMMIT ----> ${{ github.event.head_commit.message }}"
-       
     - name: Checkout de repositorio
       uses: actions/checkout@v3
     - name: Configuración de entorno de python
@@ -35,7 +30,7 @@ jobs:
           coverage report -m
            
   automerge:
-    needs: job1
+    needs: pruebas
     permissions: write-all
     runs-on: ubuntu-latest
     if: ${{ !endsWith(github.event.head_commit.message,'[release]')}}
@@ -46,10 +41,10 @@ jobs:
          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
          source-branch: ${{ github.ref }}
          target-branch: develop
-         commit-message: "Se actualiza develop con la rama ${{ github.ref }}"
+         commit-message: "Se realiza merge de la ${{ github.ref }} en develop"
          
-  release:
-    needs: job1
+  prepare_release:
+    needs: pruebas
     permissions: write-all
     runs-on: ubuntu-latest
     if: ${{ endsWith(github.event.head_commit.message,'[release]')}}
@@ -60,16 +55,11 @@ jobs:
          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
          source-branch: ${{ github.ref }}
          target-branch: develop
-         commit-message: "Listo para liberar [release]"
+         commit-message: "Merge completo. Listo para liberar [release]"
          
-     - name: Sleep for 3s
-       uses: juliangruber/sleep-action@v1
-       with:
-         time: 3s
-         
-         
+             
   invoke_workflow:
-    needs: release
+    needs: prepare_release
     permissions: write-all
     if: ${{ endsWith(github.event.head_commit.message,'[release]')}}   
     uses: fanpay/git_actions/.github/workflows/release.yml@main
