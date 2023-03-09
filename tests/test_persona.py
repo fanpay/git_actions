@@ -13,8 +13,8 @@ class PersonaTestCase(unittest.TestCase):
       self.grupo = [self.persona1, self.persona2, self.persona3]
 
    def test_constructor(self):
-      self.assertEqual(self.persona1.dar_nombre(), 'Alejandra')
-      self.assertEqual(self.persona1.dar_edad(), 25)
+      self.assertEqual(self.persona1.dar_nombre(), 'Alejandra') 
+      self.assertEqual(self.persona1.dar_edad(), 25) 
 
    def test_anio_nacimiento(self):
       self.assertEqual(self.persona1.calcular_anio_nacimiento(True), datetime.datetime.now().year - 25)
