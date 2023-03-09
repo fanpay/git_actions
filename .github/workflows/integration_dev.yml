@@ -3,8 +3,8 @@ on:
  push:
      branches:
          - 'testing_**'
+  
 jobs:
-
   tests:
     name: Pruebas
     permissions: write-all
@@ -83,6 +83,9 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
+    outputs:
+      release_version: ${{ steps.setting_version.outputs.RELEASE_VERSION }}
+      release_tag: ${{ steps.setting_version.outputs.RELEASE_TAG }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -100,43 +103,38 @@ jobs:
         uses: "WyriHaximus/github-action-next-semvers@v1"
         with:
           version: ${{ steps.previoustag.outputs.tag }}
-          
-      - name: Checking tag version
-        if: ${{ !contains(github.event.head_commit.message,'[major]')  &&  !contains(github.event.head_commit.message,'[minor]')  &&  !contains(github.event.head_commit.message,'[patch]')}}
-        run: |
-          echo "Versión no encontraba. Intenta agregar la etiqueta [minor] ó [major] ó [path] de acuerdo al tipo de versión que se desee liberar. Se finaliza job con fallos y no se genera versión"
-          exit 1
-          
-      - name: Setting MAJOR version
-        if: ${{ contains(github.event.head_commit.message,'[major]')}}
-        run: |
-          echo "RELEASE_VERSION=${{ steps.semvers.outputs.major }}" >> $GITHUB_ENV
-          echo "RELEASE_TAG=${{ steps.semvers.outputs.v_major }}" >> $GITHUB_ENV
 
-      - name: Setting MINOR version
-        if: ${{ contains(github.event.head_commit.message,'[minor]')}}
+      - name: Setting MAJOR version
+        id: setting_version
         run: |
-          echo "RELEASE_VERSION=${{ steps.semvers.outputs.minor }}" >> $GITHUB_ENV
-          echo "RELEASE_TAG=${{ steps.semvers.outputs.v_minor }}" >> $GITHUB_ENV
-        
-      - name: Setting PATCH version
-        if: ${{ contains(github.event.head_commit.message,'[patch]')}}
+          if [ ${{ contains(github.event.head_commit.message,'[major]')}} ]; then
+            echo "RELEASE_VERSION=${{ steps.semvers.outputs.major }}" >> $GITHUB_OUTPUT
+            echo "RELEASE_TAG=${{ steps.semvers.outputs.v_major }}" >> $GITHUB_OUTPUT
+            
+          else if [ ${{ contains(github.event.head_commit.message,'[minor]')}} ]; then
+            echo "RELEASE_VERSION=${{ steps.semvers.outputs.minor }}" >> $GITHUB_OUTPUT
+            echo "RELEASE_TAG=${{ steps.semvers.outputs.v_minor }}" >> $GITHUB_OUTPUT
+            
+          else if [ ${{ contains(github.event.head_commit.message,'[patch]')}} ]; then
+            echo "RELEASE_VERSION=${{ steps.semvers.outputs.patch }}" >> $GITHUB_OUTPUT
+            echo "RELEASE_TAG=${{ steps.semvers.outputs.v_patch }}" >> $GITHUB_OUTPUT
+            
+          else
+            echo "Versión no encontraba. Intenta agregar la etiqueta [minor] ó [major] ó [path] de acuerdo al tipo de versión que se desee liberar. Se finaliza job con fallos y no se genera versión"
+            exit 1
+          fi
+        shell: bash
+      - name: Read exported variable
         run: |
-          echo "RELEASE_VERSION=${{ steps.semvers.outputs.patch }}" >> $GITHUB_ENV
-          echo "RELEASE_TAG=${{ steps.semvers.outputs.v_patch }}" >> $GITHUB_ENV
-          
-      - name: Printing
-        run: |
-          echo "RELEASE_VERSION -> ${{ env.RELEASE_VERSION }}" 
-          echo "RELEASE_TAG -> ${{ env.RELEASE_TAG }}" 
-          
-          
+          echo "RELEASE_TAG: ${{ steps.setting_version.outputs.RELEASE_TAG }}"
+          echo "RELEASE_VERSION: ${{ steps.setting_version.outputs.RELEASE_VERSION }}"
+
   invoke_workflow:
     needs: [prepare_release, generate_version]
     permissions: write-all
     if: ${{ contains(github.event.head_commit.message,'[release]')}}   
     uses: fanpay/git_actions/.github/workflows/release.yml@main
     with:
-      release_version: ${{ env.RELEASE_VERSION }}
-      release_tag: ${{ env.RELEASE_TAG }}
+      release_version: ${{ needs.generate_version.outputs.release_version }}
+      release_tag: ${{ needs.generate_version.outputs.release_tag }}
          
