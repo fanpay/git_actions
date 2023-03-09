@@ -5,49 +5,7 @@ on:
          - 'testing_**'
 jobs:
 
-  generate:
-    name: Generando version
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0 # required for github-action-get-previous-tag
-
-      - name: Get Previous tag
-        id: previoustag
-        uses: 'WyriHaximus/github-action-get-previous-tag@v1'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
-      - name: Get next version
-        id: next
-        uses: 'WyriHaximus/github-action-next-release-version@1.0.0'
-        with:
-          version: ${{ steps.previoustag.outputs.tag }}
-
-      - name: 'Get next minor version'
-        id: semvers
-        uses: "WyriHaximus/github-action-next-semvers@v1"
-        with:
-          version: ${{ steps.previoustag.outputs.tag }}
-          
-      - name: print VERSIONS
-        run: |
-          echo "PREVIOUS TAG ${{ steps.previoustag.outputs.tag }}"
-          echo "SEMVERS_R PREV TAG ${{ steps.semvers.outputs.r_version }}"
-          
-          echo "VERSION PREV TAG ${{ steps.next.outputs.version }}"
-          echo "R_VERSION PREV TAG ${{ steps.next.outputs.r_version }}"
-          
-          echo "SEMVERS_V_PATCH PREV TAG ${{ steps.semvers.outputs.v_patch }}"
-          echo "SEMVERS_V_MINOR PREV TAG ${{ steps.semvers.outputs.v_minor }}"
-          echo "SEMVERS_V_MAJOR PREV TAG ${{ steps.semvers.outputs.v_major }}"
-
-  pruebas:
+  tests:
     name: Pruebas
     permissions: write-all
     runs-on: ${{ matrix.os }}
@@ -84,13 +42,13 @@ jobs:
           coverage report -m
            
   automerge:
-    needs: pruebas
+    needs: tests
     permissions: write-all
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [macos-latest]
-    if: ${{ !endsWith(github.event.head_commit.message,'[release]')}}
+    if: ${{ !contains(github.event.head_commit.message,'[release]')}}
     steps:
      - name: Mezcla ${{ github.ref }} -> develop
        uses: tukasz/direct-merge-action@master
@@ -101,13 +59,13 @@ jobs:
          commit-message: "Se realiza merge de la ${{ github.ref }} en develop"
          
   prepare_release:
-    needs: pruebas
+    needs: tests
     permissions: write-all
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [macos-latest]
-    if: ${{ endsWith(github.event.head_commit.message,'[release]')}}
+    if: ${{ contains(github.event.head_commit.message,'[release]')}}
     steps:
      - name: Mezcla ${{ github.ref }} -> develop
        uses: tukasz/direct-merge-action@master
@@ -117,12 +75,68 @@ jobs:
          target-branch: develop
          commit-message: "Merge completo. Listo para crear [release]"
          
-             
-  invoke_workflow:
+  generate_version:
+    name: Generando version
     needs: prepare_release
+    #if: ${{ contains(github.event.head_commit.message,'[release]')}}   
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Get Previous tag
+        id: previoustag
+        uses: 'WyriHaximus/github-action-get-previous-tag@v1'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: 'Get next version'
+        id: semvers
+        uses: "WyriHaximus/github-action-next-semvers@v1"
+        with:
+          version: ${{ steps.previoustag.outputs.tag }}
+          
+      - name: Checking tag version
+        if: ${{ !contains(github.event.head_commit.message,'[major]')  &&  !contains(github.event.head_commit.message,'[minor]')  &&  !contains(github.event.head_commit.message,'[patch]')}}
+        run: |
+          echo "Versión no encontraba. Intenta agregar la etiqueta [minor] ó [major] ó [path] de acuerdo al tipo de versión que se desee liberar. Se finaliza job con fallos y no se genera versión"
+          exit 1
+          
+      - name: Setting MAJOR version
+        if: ${{ contains(github.event.head_commit.message,'[major]')}}
+        run: |
+          echo "RELEASE_VERSION=${{ steps.semvers.outputs.major }}" >> $GITHUB_ENV
+          echo "RELEASE_TAG=${{ steps.semvers.outputs.v_major }}" >> $GITHUB_ENV
+
+      - name: Setting MINOR version
+        if: ${{ contains(github.event.head_commit.message,'[minor]')}}
+        run: |
+          echo "RELEASE_VERSION=${{ steps.semvers.outputs.minor }}" >> $GITHUB_ENV
+          echo "RELEASE_TAG=${{ steps.semvers.outputs.v_minor }}" >> $GITHUB_ENV
+        
+      - name: Setting PATCH version
+        if: ${{ contains(github.event.head_commit.message,'[patch]')}}
+        run: |
+          echo "RELEASE_VERSION=${{ steps.semvers.outputs.patch }}" >> $GITHUB_ENV
+          echo "RELEASE_TAG=${{ steps.semvers.outputs.v_patch }}" >> $GITHUB_ENV
+          
+      - name: Printing
+        run: |
+          echo "RELEASE_VERSION -> ${{ env.RELEASE_VERSION }}" 
+          echo "RELEASE_TAG -> ${{ env.RELEASE_TAG }}" 
+          
+          
+  invoke_workflow:
+    needs: [prepare_release, generate_version]
     permissions: write-all
-    if: ${{ endsWith(github.event.head_commit.message,'[release]')}}   
+    if: ${{ contains(github.event.head_commit.message,'[release]')}}   
     uses: fanpay/git_actions/.github/workflows/release.yml@main
     with:
-      release_version: release/1.0.3
+      release_version: ${{ env.RELEASE_VERSION }}
+      release_tag: ${{ env.RELEASE_TAG }}
          
