@@ -72,6 +72,19 @@ jobs:
         source-branch: ${{inputs.release_version}}
         target-branch: main
         commit-message: "Se integra rama ${{inputs.release_version}} en main. Rama main actualizada"
+        
+        
+    - name: Checkout de repositorio
+      uses: actions/checkout@v3
+      with:
+        ref: ${{inputs.release_version}}
+    - name: Creación de tag de versionamientos
+      run: |
+          git tag -a ${{inputs.release_tags}} -m 'Se realiza nuevo release ${{inputs.release_tags}}'
+    - name: Asignación de tag a la rama main
+      run: git push origin main
+        
+
     - name: Mezcla release -> develop
       uses: tukasz/direct-merge-action@master
       with:
