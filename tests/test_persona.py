@@ -5,7 +5,7 @@ from src.persona import Persona
 
 class PersonaTestCase(unittest.TestCase):
 
-   def setUp(self):
+   def setUp(self):  
       self.persona1 = Persona(nombre='Alejandra', edad=25)
       self.persona2 = Persona(nombre='Diego', edad=22)
       self.persona3 = Persona(nombre='Alejandra', edad=25)
@@ -13,8 +13,8 @@ class PersonaTestCase(unittest.TestCase):
       self.grupo = [self.persona1, self.persona2, self.persona3]
 
    def test_constructor(self):
-      self.assertEqual(self.persona1.dar_nombre(), 'Alejandra')
-      self.assertEqual(self.persona1.dar_edad(), 25)
+      self.assertEqual(self.persona1.dar_nombre(), 'Alejandra') 
+      self.assertEqual(self.persona1.dar_edad(), 25) 
 
    def test_anio_nacimiento(self):
       self.assertEqual(self.persona1.calcular_anio_nacimiento(True), datetime.datetime.now().year - 25)
@@ -24,10 +24,10 @@ class PersonaTestCase(unittest.TestCase):
 
    def test_asingacion(self):
       self.persona2.asignar_edad(28)
-      self.persona2.asignar_nombre("Felipe")
+      self.persona2.asignar_nombre("Pipe")
       self.assertFalse(self.persona2.dar_nombre()=='Diego')
       self.assertFalse(self.persona2.dar_edad()==22)
-      self.assertTrue(self.persona2.dar_nombre()=='Felipe')
+      self.assertTrue(self.persona2.dar_nombre()=='Pipe')
       self.assertTrue(self.persona2.dar_edad()==28)
 
    def test_objetos_iguales(self):
