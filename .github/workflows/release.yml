@@ -8,8 +8,10 @@ on:
       release_tag:
         required: true
         type: string
+        
 jobs:        
-  release:
+  create_branch_release:
+   name: Se crea la rama release
    permissions: write-all
    runs-on: ${{ matrix.os }}
    strategy:
@@ -35,9 +37,10 @@ jobs:
         source-branch: develop
         target-branch: ${{inputs.release_version}}
         commit-message: "Se actualiza la rama release con la rama develop. Release is ready to merge in main!"
-  pruebas:
-    needs: release
-    name: Pruebas
+        
+  test_branch_release:
+    needs: create_branch_release
+    name: Se prueba la rama release
     permissions: write-all
     runs-on: ${{ matrix.os }}
     strategy:
@@ -65,7 +68,17 @@ jobs:
       run: |
           coverage run -m unittest
           coverage report --fail-under=98  
-          
+
+
+  merge_branch_release:
+    needs: test_branch_release
+    name: Se realizar merge de la rama release en la rama principal main
+    permissions: write-all
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+    steps:     
     - name: Mezcla release -> main
       uses: tukasz/direct-merge-action@master
       with:
@@ -74,18 +87,6 @@ jobs:
         target-branch: main
         commit-message: "Se integra rama ${{inputs.release_version}} en main. Rama main actualizada"
         
-        
-    - name: Checkout de repositorio
-      uses: actions/checkout@v3
-      with:
-        ref: ${{inputs.release_version}}
-    - name: Creación de tag de versionamiento
-      run: |
-          git tag -a ${{inputs.release_tag}} -m 'Se realiza nuevo release ${{inputs.release_tag}}'
-    - name: Asignación de tag a la rama main
-      run: git push origin main
-        
-
     - name: Mezcla release -> develop
       uses: tukasz/direct-merge-action@master
       with:
@@ -94,4 +95,25 @@ jobs:
         target-branch: develop
         commit-message: "Se integra rama ${{inputs.release_version}} en develop. Rama develop actualizada"
            
-    
+
+
+  tagging_main:
+    needs: [merge_branch_release]
+    name: Se taggea rama principal con versión actual
+    permissions: write-all
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+    steps:
+      - name: Checkout de repositorio
+        uses: actions/checkout@v3
+        with:
+          ref: ${{inputs.release_version}}
+      - name: Creación de tag de versionamiento
+        run: |
+            git config --global user.email "admin@github.com"
+            git config --global user.name "Admin"
+            git tag -a ${{inputs.release_tag}} -m 'Se realiza nuevo release ${{inputs.release_tag}}'
+      - name: Asignación de tag a la rama main
+        run: git push origin main
