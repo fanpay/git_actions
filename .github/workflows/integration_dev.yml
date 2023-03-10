@@ -3,7 +3,7 @@ on:
  push:
      branches:
          - 'testing_**'
-  
+         
 jobs:
   tests:
     name: Pruebas
@@ -11,7 +11,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-latest]
+        os: [ubuntu-latest]
     if: ${{ contains(github.event.head_commit.message, '(Azul)') && contains(github.ref,'integration') }}
     steps:
     - name: Checkout de repositorio
@@ -47,7 +47,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-latest]
+        os: [ubuntu-latest]
     if: ${{ !contains(github.event.head_commit.message,'[release]')}}
     steps:
      - name: Mezcla ${{ github.ref }} -> develop
@@ -59,12 +59,13 @@ jobs:
          commit-message: "Se realiza merge de la ${{ github.ref }} en develop"
          
   prepare_release:
+    name: Preparar release
     needs: tests
     permissions: write-all
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-latest]
+        os: [ubuntu-latest]
     if: ${{ contains(github.event.head_commit.message,'[release]')}}
     steps:
      - name: Mezcla ${{ github.ref }} -> develop
@@ -76,9 +77,8 @@ jobs:
          commit-message: "Merge completo. Listo para crear [release]"
          
   generate_version:
-    name: Generando version
+    name: Generar versión
     needs: prepare_release
-    #if: ${{ contains(github.event.head_commit.message,'[release]')}}   
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -87,6 +87,12 @@ jobs:
       release_version: ${{ steps.setting_version.outputs.RELEASE_VERSION }}
       release_tag: ${{ steps.setting_version.outputs.RELEASE_TAG }}
     steps:
+      - name: Checking tag version
+        if: ${{ !contains(github.event.head_commit.message,'[major]')  &&  !contains(github.event.head_commit.message,'[minor]')  &&  !contains(github.event.head_commit.message,'[patch]')}}
+        run: |
+          echo "Versión no encontraba. Intenta agregar la etiqueta [minor] ó [major] ó [path] de acuerdo al tipo de versión que se desee liberar. Se finaliza job con fallos y no se genera versión"
+          exit 1
+          
       - name: Checkout
         uses: actions/checkout@v3
         with:
@@ -105,34 +111,32 @@ jobs:
           version: ${{ steps.previoustag.outputs.tag }}
 
       - name: Setting MAJOR version
+        if: ${{ contains(github.event.head_commit.message,'[major]')}}
+        run: |
+          echo "RELEASE_VERSION=${{ steps.semvers.outputs.major }}" >> $GITHUB_ENV
+          echo "RELEASE_TAG=${{ steps.semvers.outputs.v_major }}" >> $GITHUB_ENV
+      - name: Setting MINOR version
+        if: ${{ contains(github.event.head_commit.message,'[minor]')}}
+        run: |
+          echo "RELEASE_VERSION=${{ steps.semvers.outputs.minor }}" >> $GITHUB_ENV
+          echo "RELEASE_TAG=${{ steps.semvers.outputs.v_minor }}" >> $GITHUB_ENV
+        
+      - name: Setting PATCH version
+        if: ${{ contains(github.event.head_commit.message,'[patch]')}}
+        run: |
+          echo "RELEASE_VERSION=${{ steps.semvers.outputs.patch }}" >> $GITHUB_ENV
+          echo "RELEASE_TAG=${{ steps.semvers.outputs.v_patch }}" >> $GITHUB_ENV
+      
+      - name: Setting GLOBAL version
         id: setting_version
         run: |
-          if [ ${{ contains(github.event.head_commit.message,'[major]')}} ]; then
-            echo "RELEASE_VERSION=${{ steps.semvers.outputs.major }}" >> $GITHUB_OUTPUT
-            echo "RELEASE_TAG=${{ steps.semvers.outputs.v_major }}" >> $GITHUB_OUTPUT
+            echo "RELEASE_VERSION=${{ env.RELEASE_VERSION }}" >> $GITHUB_OUTPUT
+            echo "RELEASE_TAG=${{ env.RELEASE_TAG }}" >> $GITHUB_OUTPUT
             
-          else if [ ${{ contains(github.event.head_commit.message,'[minor]')}} ]; then
-            echo "RELEASE_VERSION=${{ steps.semvers.outputs.minor }}" >> $GITHUB_OUTPUT
-            echo "RELEASE_TAG=${{ steps.semvers.outputs.v_minor }}" >> $GITHUB_OUTPUT
-            
-          else if [ ${{ contains(github.event.head_commit.message,'[patch]')}} ]; then
-            echo "RELEASE_VERSION=${{ steps.semvers.outputs.patch }}" >> $GITHUB_OUTPUT
-            echo "RELEASE_TAG=${{ steps.semvers.outputs.v_patch }}" >> $GITHUB_OUTPUT
-            
-          else
-            echo "Versión no encontraba. Intenta agregar la etiqueta [minor] ó [major] ó [path] de acuerdo al tipo de versión que se desee liberar. Se finaliza job con fallos y no se genera versión"
-            exit 1
-          fi
-        shell: bash
-      - name: Read exported variable
-        run: |
-          echo "RELEASE_TAG: ${{ steps.setting_version.outputs.RELEASE_TAG }}"
-          echo "RELEASE_VERSION: ${{ steps.setting_version.outputs.RELEASE_VERSION }}"
 
   invoke_workflow:
     needs: [prepare_release, generate_version]
     permissions: write-all
-    if: ${{ contains(github.event.head_commit.message,'[release]')}}   
     uses: fanpay/git_actions/.github/workflows/release.yml@main
     with:
       release_version: ${{ needs.generate_version.outputs.release_version }}
