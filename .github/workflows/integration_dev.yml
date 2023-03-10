@@ -15,9 +15,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-    outputs:
-      release_version: ${{ steps.setting_version.outputs.RELEASE_VERSION }}
-      release_tag: ${{ steps.setting_version.outputs.RELEASE_TAG }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -42,23 +40,27 @@ jobs:
         with:
           version: ${{ steps.previoustag.outputs.tag }}
 
-      - name: Setting version
-        id: setting_version
+      - name: Setting MAJOR version
+        if: ${{ contains(github.event.head_commit.message,'[major]')}}
         run: |
-          if [ ${{ contains(github.event.head_commit.message,'[major]') }} ]; then
-            echo "RELEASE_VERSION=${{ steps.semvers.outputs.major }}" >> $GITHUB_OUTPUT
-            echo "RELEASE_TAG=${{ steps.semvers.outputs.v_major }}" >> $GITHUB_OUTPUT
-          elif [ ${{ contains(github.event.head_commit.message,'[minor]') }} ]; then
-            echo "RELEASE_VERSION=${{ steps.semvers.outputs.minor }}" >> $GITHUB_OUTPUT
-            echo "RELEASE_TAG=${{ steps.semvers.outputs.v_minor }}" >> $GITHUB_OUTPUT
-          elif [ ${{ contains(github.event.head_commit.message,'[patch]') }} ]; then
-            echo "RELEASE_VERSION=${{ steps.semvers.outputs.patch }}" >> $GITHUB_OUTPUT
-            echo "RELEASE_TAG=${{ steps.semvers.outputs.v_patch }}" >> $GITHUB_OUTPUT
-          fi
-      - name: Read exported variable
+          echo "RELEASE_VERSION=${{ steps.semvers.outputs.major }}" >> $GITHUB_ENV
+          echo "RELEASE_TAG=${{ steps.semvers.outputs.v_major }}" >> $GITHUB_ENV
+      - name: Setting MINOR version
+        if: ${{ contains(github.event.head_commit.message,'[minor]')}}
         run: |
-          echo "RELEASE_TAG: ${{ steps.setting_version.outputs.RELEASE_TAG }}"
-          echo "RELEASE_VERSION: ${{ steps.setting_version.outputs.RELEASE_VERSION }}"
+          echo "RELEASE_VERSION=${{ steps.semvers.outputs.minor }}" >> $GITHUB_ENV
+          echo "RELEASE_TAG=${{ steps.semvers.outputs.v_minor }}" >> $GITHUB_ENV
+        
+      - name: Setting PATCH version
+        if: ${{ contains(github.event.head_commit.message,'[patch]')}}
+        run: |
+          echo "RELEASE_VERSION=${{ steps.semvers.outputs.patch }}" >> $GITHUB_ENV
+          echo "RELEASE_TAG=${{ steps.semvers.outputs.v_patch }}" >> $GITHUB_ENV
+          
+      - name: Printing
+        run: |
+          echo "RELEASE_VERSION -> ${{ env.RELEASE_VERSION }}" 
+          echo "RELEASE_TAG -> ${{ env.RELEASE_TAG }}" 
 
 
 
