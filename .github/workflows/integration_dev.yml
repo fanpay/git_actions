@@ -23,6 +23,12 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
+          
+      - name: Checking tag version
+        if: ${{ !contains(github.event.head_commit.message,'[major]')  &&  !contains(github.event.head_commit.message,'[minor]')  &&  !contains(github.event.head_commit.message,'[patch]')}}
+        run: |
+          echo "Versión no encontraba. Intenta agregar la etiqueta [minor] ó [major] ó [path] de acuerdo al tipo de versión que se desee liberar. Se finaliza job con fallos y no se genera versión"
+          exit 1
 
       - name: Get Previous tag
         id: previoustag
@@ -42,18 +48,12 @@ jobs:
           if [ ${{ contains(github.event.head_commit.message,'[major]')}} ]; then
             echo "RELEASE_VERSION=${{ steps.semvers.outputs.major }}" >> $GITHUB_OUTPUT
             echo "RELEASE_TAG=${{ steps.semvers.outputs.v_major }}" >> $GITHUB_OUTPUT
-            
-          else if [ ${{ contains(github.event.head_commit.message,'[minor]')}} ]; then
+          if [ ${{ contains(github.event.head_commit.message,'[minor]')}} ]; then
             echo "RELEASE_VERSION=${{ steps.semvers.outputs.minor }}" >> $GITHUB_OUTPUT
             echo "RELEASE_TAG=${{ steps.semvers.outputs.v_minor }}" >> $GITHUB_OUTPUT
-            
-          else if [ ${{ contains(github.event.head_commit.message,'[patch]')}} ]; then
+          if [ ${{ contains(github.event.head_commit.message,'[patch]')}} ]; then
             echo "RELEASE_VERSION=${{ steps.semvers.outputs.patch }}" >> $GITHUB_OUTPUT
             echo "RELEASE_TAG=${{ steps.semvers.outputs.v_patch }}" >> $GITHUB_OUTPUT
-            
-          else
-            echo "Versión no encontraba. Intenta agregar la etiqueta [minor] ó [major] ó [path] de acuerdo al tipo de versión que se desee liberar. Se finaliza job con fallos y no se genera versión"
-            exit 1
           fi
         shell: bash
       - name: Read exported variable
