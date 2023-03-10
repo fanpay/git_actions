@@ -114,5 +114,6 @@ jobs:
         run: |
             git config --global user.email "admin@github.com"
             git config --global user.name "Admin"
-            git tag -a ${{inputs.release_tag}} -m 'Se realiza nuevo release ${{inputs.release_tag}}'
-            git push
+            git tag -a ${{inputs.release_tag}} HEAD -m 'Se realiza nuevo release ${{inputs.release_tag}}'
+            git push origin ${{inputs.release_tag}}
+            
