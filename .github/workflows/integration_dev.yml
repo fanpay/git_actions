@@ -45,16 +45,13 @@ jobs:
       - name: Setting version
         id: setting_version
         run: |
-          if [${{ contains(github.event.head_commit.message,'[major]')}}]
-          then
+          if [${{ contains(github.event.head_commit.message,'[major]')}}]; then
             echo "RELEASE_VERSION=${{ steps.semvers.outputs.major }}" >> $GITHUB_OUTPUT
             echo "RELEASE_TAG=${{ steps.semvers.outputs.v_major }}" >> $GITHUB_OUTPUT
-          elif [${{ contains(github.event.head_commit.message,'[minor]')}}]
-          then
+          elif [${{ contains(github.event.head_commit.message,'[minor]')}}]; then
             echo "RELEASE_VERSION=${{ steps.semvers.outputs.minor }}" >> $GITHUB_OUTPUT
             echo "RELEASE_TAG=${{ steps.semvers.outputs.v_minor }}" >> $GITHUB_OUTPUT
-          elif [${{ contains(github.event.head_commit.message,'[patch]')}}] 
-          then
+          elif [${{ contains(github.event.head_commit.message,'[patch]')}}]; then
             echo "RELEASE_VERSION=${{ steps.semvers.outputs.patch }}" >> $GITHUB_OUTPUT
             echo "RELEASE_TAG=${{ steps.semvers.outputs.v_patch }}" >> $GITHUB_OUTPUT
           fi
