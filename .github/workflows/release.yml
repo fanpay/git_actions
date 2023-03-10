@@ -81,7 +81,7 @@ jobs:
         ref: ${{inputs.release_version}}
     - name: Creación de tag de versionamiento
       run: |
-          git tag -a ${{inputs.release_tags}} -m 'Se realiza nuevo release ${{inputs.release_tags}}'
+          git tag -a ${{inputs.release_tag}} -m 'Se realiza nuevo release ${{inputs.release_tag}}'
     - name: Asignación de tag a la rama main
       run: git push origin main
         
